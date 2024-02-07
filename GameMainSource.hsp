@@ -4,8 +4,23 @@
 	TitleScriptPre
 	repeat
 	TitleScriptCalc
+	if TitleBreak()=1 : break
 	redraw 0
 	TitleScriptDraw
 	redraw 1
 	await 16
 	loop
+
+	//ƒƒjƒ…[‰æ–Ê
+	MenuInit "script/menu.dsp"
+	MenuScriptPre
+	repeat
+	MenuScriptCalc
+	if MenuBreak()=1 : break
+	redraw 0
+	MenuScriptDraw
+	redraw 1
+	await 16
+	loop
+
+	end

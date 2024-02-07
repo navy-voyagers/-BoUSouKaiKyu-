@@ -6,6 +6,7 @@
 //include—Ìˆæ
 #include "hspogg.as"
 #include "Title.hsp"
+#include "Menu.hsp"
 
 ////////////////////////////////////////////
 //’è‹`(‘åŽ–‚È‚à‚Ì)
