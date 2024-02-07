@@ -13,4 +13,4 @@
 	swbreak
 	swend
 
-	goto *menu
+	goto *MenuScreen
