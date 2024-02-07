@@ -11,7 +11,17 @@
 	//z key
 	getkey 90
 	if key_getkey = 1 {
-		flag 1
+		if flag = 0 {
+			flag 1
+		}
+	}
+
+	//a key
+	getkey 65
+	if key_getkey = 1 {
+		if flag = 1 {
+			flag 0
+		}
 	}
 
 	//x key
@@ -29,5 +39,15 @@
 	pos 10 10
 	color 0 0 255
 	mes Sample
+
+	if flag = 0 {
+		color 0 0 255
+		mes FLAG=0
+	}
+
+	if flag = 1 {
+		color 0 255 0
+		mes FLAG=1
+	}
 
 @DrawEnd

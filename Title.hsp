@@ -115,7 +115,7 @@
 
 	//stick(キー入力をチェック)
 	case "stick"
-	stick key_stick,int(ScriptBitData(1)),int(ScriptBitData(2))
+	stick key_stick,int(ScriptBitData(1)),int(ScriptBitData(1))
 	swbreak
 
 	//if(条件分岐)
@@ -191,6 +191,30 @@
 		}
 	}
 	swbreak
+
+	case "flag"		//flagと比較
+	if ScriptBitData(2)="=" and ScriptBitData(4)="{" {
+		if flag!int(ScriptBitData(3)) {
+			if_nest_goal=if_nest-1//ブレイク条件のネスト状況を把握
+			ScriptLineNumber+
+			repeat
+			noteget ScriptLineData,ScriptLineNumber
+			ScriptLineData=strtrim(ScriptLineData,0,'	')
+			if strmid(ScriptLineData,0,2)="if" {
+				if_nest+
+			}
+			if strmid(ScriptLineData,0,1)="}" {
+				if_nest-
+			}
+			if if_nest=if_nest_goal {
+				break
+			}
+			ScriptLineNumber+
+			loop
+		}
+	}
+	swbreak
+
 	swend
 	swbreak		//これはifのswbreakです
 
@@ -275,6 +299,37 @@
 	strrep ScriptLineData,"mes ",""
 	mes ScriptLineData
 	swbreak
+
+	//if(条件分岐)
+	case "if"
+	//ifのネストレベルを増加
+	if_nest+
+	switch ScriptBitData(1)		//何を比較するのか
+
+	case "flag"		//flagと比較
+	if ScriptBitData(2)="=" and ScriptBitData(4)="{" {
+		if flag!int(ScriptBitData(3)) {
+			if_nest_goal=if_nest-1//ブレイク条件のネスト状況を把握
+			ScriptLineNumber+
+			repeat
+			noteget ScriptLineData,ScriptLineNumber
+			ScriptLineData=strtrim(ScriptLineData,0,'	')
+			if strmid(ScriptLineData,0,2)="if" {
+				if_nest+
+			}
+			if strmid(ScriptLineData,0,1)="}" {
+				if_nest-
+			}
+			if if_nest=if_nest_goal {
+				break
+			}
+			ScriptLineNumber+
+			loop
+		}
+	}
+	swbreak
+
+	swend
 
 	swend
 
