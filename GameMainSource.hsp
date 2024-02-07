@@ -1,5 +1,7 @@
 
+*title
 	//タイトル画面
+	logmes "TITLE"
 	TitleInit "script/title.dsp"
 	TitleScriptPre
 	repeat
@@ -11,7 +13,15 @@
 	await 16
 	loop
 
+	repeat
+	getkey key,90
+	if key=0 : break
+	await 16
+	loop
+
+*menu
 	//メニュー画面
+	logmes "MENU"
 	MenuInit "script/menu.dsp"
 	MenuScriptPre
 	repeat
@@ -23,4 +33,6 @@
 	await 16
 	loop
 
-	end
+	//menuから
+	//Switchで処理の振り分けをします。
+	#include "Module/SwitchPlayerSelect.as"

@@ -30,6 +30,7 @@
 	//buffer バッファを確保します
 	case "buffer"
 	buffer int(ScriptBitData(1))
+	gsel 0,0
 	swbreak
 
 	//picload 画像をロードします。@Drawの中では出来ないので必ずここで終わらせておくこと
@@ -170,7 +171,7 @@
 
 	case "key_stick"		//stickで取得したデータ
 	if ScriptBitData(2)="&" and ScriptBitData(4)="{" {
-		if key_getkey&int(ScriptBitData(3)) {
+		if key_stick&int(ScriptBitData(3)) {
 			//とくに何もしない
 		}else{
 			if_nest_goal=if_nest-1//ブレイク条件のネスト状況を把握
@@ -226,7 +227,6 @@
 
 	case "break"
 	BreakMode=1
-	break
 	swbreak
 
 	case "end"

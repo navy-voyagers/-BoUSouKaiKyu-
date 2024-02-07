@@ -41,7 +41,7 @@ onerror *Error
 ////////////////////////////////////////////
 //‚±‚±‚É‚Ù‚©‚Ì“z‚ğinclude‚µˆÚ“®
 #include "GameMainSource.hsp"
-
+stop
 ////////////////////////////////////////////
 *Error
 ErrDialogC "Windows‚É‚æ‚é•s‹ï‡•ñ","lparam:"+str(lparam)+"wparam:"+str(wparam)

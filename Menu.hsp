@@ -1,6 +1,5 @@
 #module MenuScreen
 #deffunc MenuInit str MenuScriptFileName		//タイトル画面初期化命令	
-	dmmini
 	notesel MenuScript
 	FCText MenuScriptFileName
 	sdim ScriptBitData,32,8
@@ -30,6 +29,7 @@
 	//buffer バッファを確保します
 	case "buffer"
 	buffer int(ScriptBitData(1))
+	gsel 0,0
 	swbreak
 
 	//picload 画像をロードします。@Drawの中では出来ないので必ずここで終わらせておくこと
@@ -116,7 +116,7 @@
 
 	//stick(キー入力をチェック)
 	case "stick"
-	stick key_stick,int(ScriptBitData(1)),int(ScriptBitData(1))
+	stick key_stick,int(ScriptBitData(1)),int(ScriptBitData(2))
 	swbreak
 
 	//if(条件分岐)
@@ -170,7 +170,7 @@
 
 	case "key_stick"		//stickで取得したデータ
 	if ScriptBitData(2)="&" and ScriptBitData(4)="{" {
-		if key_getkey&int(ScriptBitData(3)) {
+		if key_stick&int(ScriptBitData(3)) {
 			//とくに何もしない
 		}else{
 			if_nest_goal=if_nest-1//ブレイク条件のネスト状況を把握
@@ -226,7 +226,6 @@
 
 	case "break"
 	BreakMode=1
-	break
 	swbreak
 
 	case "end"
@@ -234,6 +233,9 @@
 	swbreak
 
 	swend
+
+	//メニュー選択を書きやすくするモジュール
+	#include "Module/SelectCalc.as"
 
 	//@CalcEnd
 	if ScriptLineData="@CalcEnd" {
@@ -339,6 +341,9 @@
 
 	swend
 
+	//メニュー選択を書きやすくするモジュール
+	#include "Module/SelectDraw.as"
+
 	//@DrawEnd
 	if ScriptLineData="@DrawEnd" {
 		//logmes "正常に@DrawEndまで実行されました"
@@ -359,5 +364,7 @@
 
 #defcfunc MenuBreak
 	return BreakMode
+#defcfunc MenuPlayerSelect
+	return PlayerSelect
 
 #global
