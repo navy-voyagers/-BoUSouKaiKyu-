@@ -1,5 +1,5 @@
 
-*title
+*TitleScreen
 	//タイトル画面
 	logmes "TITLE"
 	TitleInit "script/title.dsp"
@@ -19,7 +19,7 @@
 	await 16
 	loop
 
-*menu
+*MenuScreen
 	//メニュー画面
 	logmes "MENU"
 	MenuInit "script/menu.dsp"
