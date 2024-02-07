@@ -1,0 +1,317 @@
+#include "hspogg.as"
+
+#module TitleScreen
+#deffunc TitleInit str TitleScriptFileName		//タイトル画面初期化命令	
+	dmmini
+	notesel TitleScript
+	FCText TitleScriptFileName
+	sdim ScriptBitData,32,8
+	return
+#deffunc TitleScriptPre
+	notesel TitleScript
+	ScriptLineNumber=notefind("@PreScript",1)		//実行ラインをセット
+	if stat=-1 {
+		logmes "@PreScriptが見当たりません(PreScriptReadモードを終了します)"
+		return
+	}
+	repeat
+	noteget ScriptLineData,ScriptLineNumber
+	ScriptLineData=strtrim(ScriptLineData,0,'	')	//両端のTab削除(スペースの字下げは出来ないです。すんません)
+
+	//コメント削除(簡易)
+	if strmid(ScriptLineData,0,2)="//" {
+		ScriptLineData=""
+	}
+
+	//Scriptを理解できる形に変換(分割)
+	split ScriptLineData," ",ScriptBitData(0)
+
+	//スクリプトを読む
+	switch ScriptBitData(0)
+	//buffer バッファを確保します
+	case "buffer"
+	buffer int(ScriptBitData(1))
+	swbreak
+
+	//picload 画像をロードします。@Drawの中では出来ないので必ずここで終わらせておくこと
+	case "picload"
+	gsel int(ScriptBitData(1)),0		//引数の一番目にどのbufferにロードするかを指定すること
+	picload ScriptBitData			//引数の二番目にファイルのパスを入力してください。
+	gsel 0,0				//screen 0に描画先を戻します.。
+	swbreak
+
+	case "flag"
+	flag=int(ScriptBit(1))
+	logmes "変更>>flag="+flag
+	swbreak
+
+	//soundload 音楽データをロードします @Calcの中では出来ないのでかならずここで終わらせとけ()
+	case "soundload"
+	dmmload str(ScriptBitData(1)),int(ScriptBitData(2)),int(ScriptBitData(3))			//書き方はdmmloadそのまま
+	logmes str(ScriptBitData(1))
+	swbreak
+
+	//soundplay 音楽データの再生をします。BGMはここで。おすすめ
+	case "soundplay"
+	dmmplay int(ScriptBitData(1)),int(ScriptBitData(2))							//書き方はdmmplayそのまま
+	logmes str(ScriptBitData(1))
+	swbreak
+
+	//soundstop 音楽データの再生停止 dmmstopと同じ
+	case "soundstop"
+	dmmstop int(ScriptBitData(1))
+	logmes str(ScriptBitData(1))
+	swbreak
+
+	//font この命令だけは引数をカンマで区切ってください
+	case "font"
+	split ScriptBitData(1),",",font_var_1,font_var_2,font_var_3
+	font str(font_var_1),int(font_var_2),int(font_var_3)
+	logmes str(font_var_1)+","+str(font_var_2)+","+str(font_var_3)
+	swbreak
+
+	swend
+	//@PreScriptEnd
+	if ScriptLineData="@PreScriptEnd" {
+		logmes "正常に@PreScriptEndまで実行されました"
+		break
+	}
+	if ScriptLineNumber=notemax {
+		logmes "@PreScriptEndが見当たりません"
+		ErrDialogC "<script/Title.ts>内に@PreScriptEndがありません","ERROR"
+	}
+
+	//スクリプトラインをずらす
+	ScriptLineNumber+
+
+	//test
+	//await 16
+	loop
+	return
+
+#deffunc TitleScriptCalc
+	notesel TitleScript
+	ScriptLineNumber=notefind("@Calc",1)		//実行ラインをセット
+	if stat=-1 {
+		logmes "@Calcが見当たりません"
+		ErrDialogC "<script/Title.dsp>内に@Calcがありません","error"
+	}
+	repeat
+	noteget ScriptLineData,ScriptLineNumber
+	ScriptLineData=strtrim(ScriptLineData,0,'	')	//両端のTab削除(スペースの字下げは出来ないです。すんません)
+
+	//コメント削除(簡易)
+	if strmid(ScriptLineData,0,2)="//" {
+		ScriptLineData=""
+	}
+
+	//Scriptを理解できる形に変換(分割)
+	split ScriptLineData," ",ScriptBitData(0)
+
+	//スクリプトを読む
+	switch ScriptBitData(0)
+	//getkey(キー入力をチェック)
+	case "getkey"
+	getkey key_getkey,int(ScriptBitData(1))		//keyに押されたら1、押されてなかったら0を代入します。
+	swbreak
+
+	//stick(キー入力をチェック)
+	case "stick"
+	stick key_stick,int(ScriptBitData(1)),int(ScriptBitData(2))
+	swbreak
+
+	//if(条件分岐)
+	case "if"
+	//ifのネストレベルを増加
+	if_nest+
+	switch ScriptBitData(1)		//何を比較するのか
+
+	case "key_getkey"		//getkeyで取得したデータ
+	if ScriptBitData(2)="=" and ScriptBitData(4)="{" {
+		if key_getkey!int(ScriptBitData(3)) {
+			if_nest_goal=if_nest-1//ブレイク条件のネスト状況を把握
+			ScriptLineNumber+
+			repeat
+			noteget ScriptLineData,ScriptLineNumber
+			ScriptLineData=strtrim(ScriptLineData,0,'	')
+			if strmid(ScriptLineData,0,2)="if" {
+				if_nest+
+			}
+			if strmid(ScriptLineData,0,1)="}" {
+				if_nest-
+			}
+			if if_nest=if_nest_goal {
+				break
+			}
+			ScriptLineNumber+
+			loop
+		}
+	}
+	if ScriptBitData(2)="!" and ScriptBitData(4)="{" {
+		if key_getkey=int(ScriptBitData(3)) {
+			if_nest_goal=if_nest-1//ブレイク条件のネスト状況を把握
+			ScriptLineNumber+
+			repeat
+			noteget ScriptLineData,ScriptLineNumber
+			ScriptLineData=strtrim(ScriptLineData,0,'	')
+			if strmid(ScriptLineData,0,2)="if" {
+				if_nest+
+			}
+			if strmid(ScriptLineData,0,1)="}" {
+				if_nest-
+			}
+			if if_nest=if_nest_goal {
+				break
+			}
+			ScriptLineNumber+
+			loop
+		}
+	}
+	swbreak
+
+	case "key_stick"		//stickで取得したデータ
+	if ScriptBitData(2)="&" and ScriptBitData(4)="{" {
+		if key_getkey&int(ScriptBitData(3)) {
+			//とくに何もしない
+		}else{
+			if_nest_goal=if_nest-1//ブレイク条件のネスト状況を把握
+			ScriptLineNumber+
+			repeat
+			noteget ScriptLineData,ScriptLineNumber
+			ScriptLineData=strtrim(ScriptLineData,0,'	')
+			if strmid(ScriptLineData,0,2)="if" {
+				if_nest+
+			}
+			if strmid(ScriptLineData,0,1)="}" {
+				if_nest-
+			}
+			if if_nest=if_nest_goal {
+				break
+			}
+			ScriptLineNumber+
+			loop
+		}
+	}
+	swbreak
+	swend
+	swbreak		//これはifのswbreakです
+
+	case "flag"		//flagを使ってシーンの管理をします(整数値)
+	flag=int(ScriptBitData(1))
+	logmes "変更>>flag="+flag
+	swbreak
+
+	case "end"
+	end
+	swbreak
+
+	swend
+
+	//@CalcEnd
+	if ScriptLineData="@CalcEnd" {
+		//logmes "正常に@CalcEndまで実行されました"
+		break
+	}
+	if ScriptLineNumber=notemax {
+		logmes "@CalcEndが見当たりません"
+		ErrDialogC "<script/Title.ts>内に@CalcEndがありません","ERROR"
+	}
+
+	//スクリプトラインをずらす
+	ScriptLineNumber+
+
+	//test
+	//await 16
+	loop
+	return
+
+#deffunc TitleScriptDraw
+	notesel TitleScript
+	ScriptLineNumber=notefind("@Draw",1)		//実行ラインをセット
+	if stat=-1 {
+		logmes "@Drawが見当たりません"
+		ErrDialogC "<script/Title.dsp>内に@Drawがありません","error"
+	}
+	repeat
+	noteget ScriptLineData,ScriptLineNumber
+	ScriptLineData=strtrim(ScriptLineData,0,'	')	//両端のTab削除(スペースの字下げは出来ないです。すんません)
+
+	//コメント削除(簡易)
+	if strmid(ScriptLineData,0,2)="//" {
+		ScriptLineData=""
+	}
+
+	//Scriptを理解できる形に変換(分割)
+	split ScriptLineData," ",ScriptBitData(0)
+
+	//スクリプトを読む
+	switch ScriptBitData(0)
+
+	//boxf HSPのboxfと全く同じです。(カンマが全部スペースに変わっただけ)
+	case "boxf"
+	boxf int(ScriptBitData(1)),int(ScriptBitData(2)),int(ScriptBitData(3)),int(ScriptBitData(4))
+	swbreak
+
+	//line HSPのlineと全く同じです
+	case "line"
+	boxf int(ScriptBitData(1)),int(ScriptBitData(2)),int(ScriptBitData(3)),int(ScriptBitData(4))
+	swbreak
+
+	//color HSPのcolorと全く同じです
+	case "color"
+	color int(ScriptBitData(1)),int(ScriptBitData(2)),int(ScriptBitData(3))
+	swbreak
+
+	//pos HSPのposと全く同じです
+	case "pos"
+	pos int(ScriptBitData(1)),int(ScriptBitData(2))
+	swbreak
+
+	//gcopy HSPのgcopyと全く同じです
+	case "gcopy"
+	gcopy int(ScriptBitData(1)),int(ScriptBitData(2)),int(ScriptBitData(3)),int(ScriptBitData(4)),int(ScriptBitData(5))
+	swbreak
+
+	//mes HSPのmesとほとんど同じです。ただし""で囲わなくていいです。2番目の引数現在使えません()
+	case "mes"
+	strrep ScriptLineData,"mes ",""
+	mes ScriptLineData
+	swbreak
+
+	swend
+
+	//@DrawEnd
+	if ScriptLineData="@DrawEnd" {
+		//logmes "正常に@DrawEndまで実行されました"
+		break
+	}
+	if ScriptLineNumber=notemax {
+		logmes "@DrawEndが見当たりません"
+		ErrDialogC "<script/Title.ts>内に@CalcEndがありません","ERROR"
+	}
+
+	//スクリプトラインをずらす
+	ScriptLineNumber+
+
+	//test
+	//await 16
+	loop
+	return
+
+#global
+
+	//sample
+
+
+	TitleInit "script/Title.dsp"
+	TitleScriptPre
+	repeat
+	TitleScriptCalc
+	redraw 0
+	TitleScriptDraw
+	redraw 1
+	await 16
+	loop
+
+	#include "Main.hsp"
+

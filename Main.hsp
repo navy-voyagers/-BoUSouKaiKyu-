@@ -1,0 +1,47 @@
+//髦ｿ菟雉鬮(ぼうそうかいきゅう,BoUSouKaiKyu)
+//Made by .and other
+//MIT
+
+////////////////////////////////////////////
+//include領域
+;#include "hspogg.as"
+;#include "Title.hsp"
+
+////////////////////////////////////////////
+//定義(大事なもの)
+GameTitle="髦ｿ菟雉鬮"//タイトル系
+GameTitleKana="BousouKaikyu"
+GameTitleEnglish="BousouKaikyu -Game of Barrage Shooter-"
+notesel NBuffer//note系	NBuffer
+title GameTitle
+onerror *Error
+
+////////////////////////////////////////////
+//Module
+#module
+#deffunc ErrDialog str p1, str p2	//深刻ではないエラー用,引数1 タイトル 引数2 内容
+	dialog ""+p1,1,""+p2+" - "+GameTitle@
+	return
+#deffunc ErrDialogC str p1, str p2	//深刻なエラー用,引数1 タイトル 引数2 内容
+	dialog ""+p1,1,""+p2+" - "+GameTitle@
+	end
+	return
+#deffunc FCSimple str p1//ファイル存在確認関数
+	exist p1
+	if strsize=-1{ErrDialog p1+"が見つかりません。\nディレクトリ構造要確認。","ファイルI/Oエラー"}
+	return 0
+#deffunc FCText str filename//noteloadの安全版命令
+	exist filename
+	if strsize=-1{return ""}
+	noteload filename
+	return 0
+#global
+
+////////////////////////////////////////////
+//ここにほかの奴をincludeし移動
+//#inlude ""
+
+////////////////////////////////////////////
+*Error
+ErrDialogC "Windowsによる不具合報告","lparam:"+str(lparam)+"wparam:"+str(wparam)
+end
