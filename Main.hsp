@@ -19,6 +19,8 @@ onerror *Error
 
 ////////////////////////////////////////////
 //Module
+#include "ini_system.hsp"
+
 #module
 #deffunc ErrDialog str p1, str p2	//深刻ではないエラー用,引数1 タイトル 引数2 内容
 	dialog ""+p1,1,""+p2+" - "+GameTitle@
@@ -27,21 +29,50 @@ onerror *Error
 	dialog ""+p1,1,""+p2+" - "+GameTitle@
 	end
 	return
-#deffunc FCSimple str p1//ファイル存在確認関数
+#defcfunc FCSimple str p1//ファイル存在確認関数
 	exist p1
-	if strsize=-1{ErrDialog p1+"が見つかりません。\nディレクトリ構造要確認。","ファイルI/Oエラー"}
+	if strsize=-1{return 1}
 	return 0
 #deffunc FCText str filename//noteloadの安全版命令
 	exist filename
 	if strsize=-1{return ""}
 	noteload filename
 	return 0
+#defcfunc GetBinSTR str p1, str p2//GetBinSTRは文字型でUserData.binからデータを取得します。p1はセクション,p2は値名。文字が返ってきます。
+		ini_load "UserData.bin"//例tmp=GetBinStr("セクション","値")
+		if p1=""{dialog "プログラムに問題があります。GetBinSTR関数は破綻しました(p1)":end}
+		if p2=""{dialog "プログラムに問題があります。GetBinSTR関数は破綻しました(p2)":end}
+		sdim tmp , 1024
+		ini_section_sel p1
+		ini_get p2 , tmp
+		if stat=1 {dialog ""+GameTitle+" のセーブデータが破損しました。\n値"+p2+"["+p1+"]は存在しません。":end}
+	return tmp
+#defcfunc GetBinINT str p1, str p2//GetBinINTはint型でUserData.binからデータを取得します。p1はセクション,p2は値名。数値が返ってきます。
+		ini_load "UserData.bin"//例tmp=GetBinINT("セクション","値")
+		if p1=""{dialog "プログラムに問題があります。GetBinSTR関数は破綻しました(p1)":end}
+		if p2=""{dialog "プログラムに問題があります。GetBinSTR関数は破綻しました(p2)":end}
+		sdim tmp , 1024
+		ini_section_sel p1
+		ini_get p2 , tmp
+		if stat=1 {dialog ""+GameTitle@+" のセーブデータが破損しました。\n値"+p2+"["+p1+"]は存在しません。":end}
+	return int(tmp)
 #global
+////////////////////////////////////////////
+//読み込み用
+ini_set
+if FCSimple("UserData.bin")=1{dialog "ユーザデータがないっぽい。ここから作成に分岐してね"}
+ini_load "UserData.bin"//あった場合読み込む
+UserName=GetBinSTR("ROM","UserName")//ユーザ名
+SetLevel=GetBinSTR("ROM","SetLevel")//難易度
+SavedStage=GetBinINT("RAM","SavedStage")//セーブしたステージ
+Life=GetBinINT("RAM","Life")//体力
+Spell=GetBinINT("RAM","Spell")//スペル
+//if sysinfo(1)!=GetBinSTR("AntiCheat","WinName"){dialog "このセーブデータは不正です。あなたのデータじゃないよね。":end}
 
 ////////////////////////////////////////////
 //ここにほかの奴をincludeし移動
 #include "GameMainSource.hsp"
-
+stop
 ////////////////////////////////////////////
 *Error
 ErrDialogC "Windowsによる不具合報告","lparam:"+str(lparam)+"wparam:"+str(wparam)
