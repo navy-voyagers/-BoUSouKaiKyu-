@@ -1,0 +1,11 @@
+
+	//ƒ^ƒCƒgƒ‹‰æ–Ê
+	TitleInit "script/title.dsp"
+	TitleScriptPre
+	repeat
+	TitleScriptCalc
+	redraw 0
+	TitleScriptDraw
+	redraw 1
+	await 16
+	loop
