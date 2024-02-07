@@ -11,7 +11,7 @@
 	//z key
 	getkey 90
 	if key_getkey = 1 {
-		frag 1
+		flag 1
 	}
 
 	//x key
