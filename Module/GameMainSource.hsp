@@ -1,0 +1,38 @@
+
+*TitleScreen
+	//タイトル画面
+	logmes "TITLE"
+	TitleInit "script/title.dsp"
+	TitleScriptPre
+	repeat
+	TitleScriptCalc
+	if TitleBreak()=1 : break
+	redraw 0
+	TitleScriptDraw
+	redraw 1
+	await 16
+	loop
+
+	repeat
+	getkey key,90
+	if key=0 : break
+	await 16
+	loop
+
+*MenuScreen
+	//メニュー画面
+	logmes "MENU"
+	MenuInit "script/menu.dsp"
+	MenuScriptPre
+	repeat
+	MenuScriptCalc
+	if MenuBreak()=1 : break
+	redraw 0
+	MenuScriptDraw
+	redraw 1
+	await 16
+	loop
+
+	//menuから
+	//Switchで処理の振り分けをします。
+	#include "Module/SwitchPlayerSelect.as"
